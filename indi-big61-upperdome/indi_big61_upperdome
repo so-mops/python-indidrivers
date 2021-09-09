@@ -1,0 +1,2 @@
+#!/bin/bash
+/home/mtnops/src/git-clones/python-indidrivers/env/bin/python3 /home/mtnops/src/git-clones/python-indidrivers/indi-big61-upperdome/indi_big61_upperdome.py
