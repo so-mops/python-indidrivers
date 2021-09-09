@@ -1,0 +1,3 @@
+wheel==0.37.0
+git+https://github.com/so-mops/mtnpy.git
+git+https://github.com/so-mops/pyINDI.git

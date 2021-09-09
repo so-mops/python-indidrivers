@@ -270,7 +270,7 @@ class WeatherDevice(device):
             lp_selector = lvp_selector[no_csp(data[f'{condition}_condition'])]
             state = set_state(lp_selector)
             lp_selector.value = state
-            lvp_selector.state = IPState.OK
+            lvp_selector.state = state
             # Set the change
             self.IDSet(lvp_selector)
         

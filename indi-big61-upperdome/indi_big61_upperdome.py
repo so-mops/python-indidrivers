@@ -148,11 +148,9 @@ class Device(device):
         This function is always called by the 
         mainloop
         """
-
-
-        self.IDMessage(f"{device}, {name=='CONNECTION'}, {names}, {values}")
-
-
+        
+        return
+                    
     @device.repeat(1000)
     def update(self):
         """Gets the upperdome information and sets values"""
@@ -200,7 +198,6 @@ class Device(device):
         self.IDSet(engineering_details)
 
         return 
-
 
 def no_csp(value):
     """Removes space and case"""
