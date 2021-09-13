@@ -230,7 +230,12 @@ class Device(device):
         """A switch was updated by the client"""
         # Figure out what switch vp was clicked on
         if name == 'commands':
-            stop = True if values[2] == 'On' else False
+            self.IDMessage(f'values are equal to {values} names={names}')
+            # If stop is selected...
+            stop = False
+            if 'stop' in names:
+                stop_index = names.index('stop')
+                stop = values[stop_index] == 'On'
 
             # Even if busy let it send stop
             if upper_dome.busy() and stop:
@@ -238,9 +243,14 @@ class Device(device):
                 # Send stop to upperdome
                 try:
                     ok = telescope.upperdome.command_stop()
-                except ValueError:
-                    # This is a hack until we get returns from NG
-                    pass
+                    if not ok: raise
+
+                    # Finish stop
+                    svp.state = IPState.BUSY
+                    self.IDMessage('Stopped upperdome')
+                    self.IDSet(svp)
+                    return 
+
                 except Exception:
                     svp.state = IPState.ALERT
                     svp['stop'].value = 'Off'
@@ -248,7 +258,7 @@ class Device(device):
                     self.IDSet(svp)
 
                     return
-
+                
             elif upper_dome.busy():
                 # Don't let upperdome be sent a command unless it is stop
                 self.IDMessage('Busy...ignoring all buttons except stop')
@@ -260,9 +270,7 @@ class Device(device):
                 # Open all
                 try:
                     ok = telescope.upperdome.command_all_open()
-                except ValueError:
-                    # This is a hack until we get returns from NG
-                    pass
+                    if not ok: raise
                 except Exception:
                     svp.state = IPState.ALERT
                     svp['open_all'].value == 'Off'
@@ -277,9 +285,7 @@ class Device(device):
                 # Close all
                 try:
                     ok = telescope.upperdome.command_all_close()
-                except ValueError:
-                    # This is a hack until we get returns from NG
-                    pass
+                    if not ok: raise
                 except Exception:
                     svp.state = IPState.ALERT
                     svp['close_all'].value == 'Off'
@@ -292,9 +298,10 @@ class Device(device):
                 # Stop it
                 try:
                     ok = telescope.upperdome.command_stop()
-                except ValueError:
-                    # This is a hack until we get returns from NG
-                    pass
+                    if not ok: raise
+                    # Even though state message updates LED, want users to see
+                    # some busy light when stopped, even if a second
+                    svp.state = IPState.BUSY
                 except Exception:
                     svp.state = IPState.ALERT
                     svp['stop'].value == 'Off'
