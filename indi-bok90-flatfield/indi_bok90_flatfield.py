@@ -78,7 +78,7 @@ class Device(device):
                     self.IDMessage(error)
                     sp.state = IPState.ALERT
 
-            if sp['halogen_power'.value] == 'Off':
+            if sp['halogen_power'].value == 'Off':
                 # Turn off halogen
                 try:
                     ok = telescope.ninety_prime_flatfield.command_halogen(False)
