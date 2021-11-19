@@ -48,6 +48,7 @@ class Device(device):
         """A switch was updated by the client"""
         # Figure out what switch vp was clicked on
         if name == 'commands':
+            # commands are checkboxes, so do if statements, not elif
             sp = self.IUUpdate(device, name, values, names)
 
             if sp['halogen_power'].value == 'On':
@@ -105,16 +106,14 @@ class Device(device):
             return
         
         # Toggle on or off
-        sp.state = IPState.OK
-        if data['uband_lamps']:
-            sp['uband_power'].value = 'On'
-            sp.state = IPState.BUSY
+        if data['uband_lamps']: sp['uband_power'].value = 'On'
         else: sp['uband_power'].value = 'Off'
 
-        if data['halogen_lamps']:
-            sp['halogen_power'].value = 'On'
-            sp.state = IPState.BUSY
+        if data['halogen_lamps']: sp['halogen_power'].value = 'On'
         else: sp['halogen_power'].value = 'Off'
+
+        if True in data: sp.state = IPState.BUSY # If any lamps are on
+        else: sp.state = IPState.OK
 
         self.IDSet(sp)
 
