@@ -60,7 +60,7 @@ class Device(device):
                     self.IDMessage(error)
                     sp.state = IPState.ALERT
 
-            elif sp['uband_power'].value == 'On':
+            if sp['uband_power'].value == 'On':
                 # Turn on uband
                 try:
                     ok = telescope.ninety_prime_flatfield.command_uband(True)
@@ -69,7 +69,7 @@ class Device(device):
                     self.IDMessage(error)
                     sp.state = IPState.ALERT
 
-            elif sp['uband_power'].value == 'Off':
+            if sp['uband_power'].value == 'Off':
                 # Turn off uband
                 try:
                     ok = telescope.ninety_prime_flatfield.command_uband(False)
@@ -78,7 +78,7 @@ class Device(device):
                     self.IDMessage(error)
                     sp.state = IPState.ALERT
 
-            elif sp['halogen_power'.value] == 'Off':
+            if sp['halogen_power'.value] == 'Off':
                 # Turn off halogen
                 try:
                     ok = telescope.ninety_prime_flatfield.command_halogen(False)
