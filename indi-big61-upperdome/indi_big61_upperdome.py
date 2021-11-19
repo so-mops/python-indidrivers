@@ -90,7 +90,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path.cwd().parent))
 
 # Github imports
-from mtnpy import Kuiper
+from mtnpy import Bok
 from pyindi.device import *
 
 # Constants

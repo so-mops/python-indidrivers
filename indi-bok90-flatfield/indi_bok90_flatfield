@@ -1,0 +1,2 @@
+#!/bin/bash
+/home/mtnops/src/git-clones/python-indidrivers/env/bin/python3 /home/mtnops/src/git-clones/python-indidrivers/indi-bok90-flatfield/indi_bok90_flatfield.py
