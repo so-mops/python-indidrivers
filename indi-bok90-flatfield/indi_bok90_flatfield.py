@@ -112,7 +112,7 @@ class Device(device):
         if data['halogen_lamps']: sp['halogen_power'].value = 'On'
         else: sp['halogen_power'].value = 'Off'
 
-        if True in data: sp.state = IPState.BUSY # If any lamps are on
+        if True in data.keys(): sp.state = IPState.BUSY # If any lamps are on
         else: sp.state = IPState.OK
 
         self.IDSet(sp)
