@@ -48,7 +48,6 @@ class Device(device):
         """A switch was updated by the client"""
         # Figure out what switch vp was clicked on
         if name == 'commands':
-            self.IDMessage(f'Value={values} names={names}')
             sp = self.IUUpdate(device, name, values, names)
 
             if sp['halogen_power'].value == 'On':
@@ -56,8 +55,8 @@ class Device(device):
                 try:
                     ok = telescope.ninety_prime_flatfield.command_halogen(True)
                     if not ok: raise
-                except Exception as error:
-                    self.IDMessage(error)
+                except Exception as e:
+                    self.IDMessage(error('Could not turn on halogen'))
                     sp.state = IPState.ALERT
 
             if sp['uband_power'].value == 'On':
@@ -65,8 +64,8 @@ class Device(device):
                 try:
                     ok = telescope.ninety_prime_flatfield.command_uband(True)
                     if not ok: raise
-                except Exception as error:
-                    self.IDMessage(error)
+                except Exception as e:
+                    self.IDMessage(error('Could not turn on uband'))
                     sp.state = IPState.ALERT
 
             if sp['uband_power'].value == 'Off':
@@ -74,8 +73,8 @@ class Device(device):
                 try:
                     ok = telescope.ninety_prime_flatfield.command_uband(False)
                     if not ok: raise
-                except Exception as error:
-                    self.IDMessage(error)
+                except Exception as e:
+                    self.IDMessage(error('Could not turn on uband'))
                     sp.state = IPState.ALERT
 
             if sp['halogen_power'].value == 'Off':
@@ -83,8 +82,8 @@ class Device(device):
                 try:
                     ok = telescope.ninety_prime_flatfield.command_halogen(False)
                     if not ok: raise
-                except Exception as error:
-                    self.IDMessage(error)
+                except Exception as e:
+                    self.IDMessage(error('Could not turn on halogen'))
                     sp.state = IPState.ALERT
 
             # Update switch
@@ -100,25 +99,35 @@ class Device(device):
         try:
             data = telescope.ninety_prime_flatfield.request_all()
         except Exception as error:
-            self.IDMessage(f'[ERROR] Could not fetch flatfield status')
+            self.IDMessage(error('Could not fetch flatfield status'))
             sp.state = IPState.ALERT
             self.IDSet(sp)
             return
         
         # Toggle on or off
+        sp.state = IPState.OK
         if data['uband_lamps']:
             sp['uband_power'].value = 'On'
+            sp.state = IPState.BUSY
         else: sp['uband_power'].value = 'Off'
 
         if data['halogen_lamps']:
             sp['halogen_power'].value = 'On'
+            sp.state = IPState.BUSY
         else: sp['halogen_power'].value = 'Off'
 
-        # Set indicator to green
-        sp.state = IPState.OK
         self.IDSet(sp)
 
         return
+    
+def error(message):
+    return f'[ERROR] {message}'
+def warn(message):
+    return f'[WARN] {message}'
+def info(message):
+    return f'[INFO] {message}'
+def debug(message):
+    return f'[DEBUG] {message}'
 
 driver = Device(name=MYDEVICE)
 driver.start()
