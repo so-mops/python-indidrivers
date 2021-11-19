@@ -10,9 +10,8 @@ from mtnpy import Bok
 from pyindi.device import *
 
 # Constants
-MYDEVICE = 'Flatfield'
+MYDEVICE = '90Prime Flatfield'
 MAIN_CONTROL_GROUP = 'Main Control'
-TELEMETRY_GROUP = 'Telemetry'
 
 # Globals
 telescope = Bok()
@@ -49,64 +48,74 @@ class Device(device):
         """A switch was updated by the client"""
         # Figure out what switch vp was clicked on
         if name == 'commands':
+            self.IDMessage(f'Value={values} names={names}')
             sp = self.IUUpdate(device, name, values, names)
-            if sp['halogen_power'] == 'On':
+
+            if sp['halogen_power'].value == 'On':
                 # Turn on halogen
                 try:
-                    ok = telescope.ninetry_prime_flatfield.command_halogen(True)
+                    ok = telescope.ninety_prime_flatfield.command_halogen(True)
                     if not ok: raise
-                except Exception:
+                except Exception as error:
+                    self.IDMessage(error)
                     sp.state = IPState.ALERT
-                    self.IDSet(sp)
-                    return
-            elif sp['uband_power'] == 'On':
+
+            elif sp['uband_power'].value == 'On':
                 # Turn on uband
                 try:
-                    ok = telescope.ninetry_prime_flatfield.command_uband(True)
+                    ok = telescope.ninety_prime_flatfield.command_uband(True)
                     if not ok: raise
-                except Exception:
+                except Exception as error:
+                    self.IDMessage(error)
                     sp.state = IPState.ALERT
-                    self.IDSet(sp)
-                    return
-            elif sp['uband_power'] == 'Off':
+
+            elif sp['uband_power'].value == 'Off':
                 # Turn off uband
                 try:
-                    ok = telescope.ninetry_prime_flatfield.command_uband(False)
+                    ok = telescope.ninety_prime_flatfield.command_uband(False)
                     if not ok: raise
-                except Exception:
+                except Exception as error:
+                    self.IDMessage(error)
                     sp.state = IPState.ALERT
-                    self.IDSet(sp)
-                    return
-            elif sp['halogen_power'] == 'Off':
+
+            elif sp['halogen_power'.value] == 'Off':
                 # Turn off halogen
                 try:
-                    ok = telescope.ninetry_prime_flatfield.command_halogen(False)
+                    ok = telescope.ninety_prime_flatfield.command_halogen(False)
                     if not ok: raise
-                except Exception:
+                except Exception as error:
+                    self.IDMessage(error)
                     sp.state = IPState.ALERT
-                    self.IDSet(sp)
-                    return
-        self.IDSet(sp)
-        
+
+            # Update switch
+            self.IDSet(sp)
+
+        return
+
     @device.repeat(500)
     def update(self):
-        """Called after first getProperties"""
+        """Called after first getProperties and gets the lamp status"""
         # Get current state
         sp = self.IUFind('commands')
         try:
             data = telescope.ninety_prime_flatfield.request_all()
-
-            # Toggle on or off
-            if data['uband_lamps']:
-                sp['uband_power'].value = 'On'
-            else: sp['uband_power'].value = 'Off'
-
-            if data['halogen_lamps']:
-                sp['halogen_power'].value = 'On'
-            else: sp['halogen_power'].value = 'Off'
-        except Exception:
-            sp.state = IPState.BUSY
+        except Exception as error:
+            self.IDMessage(f'[ERROR] Could not fetch flatfield status')
+            sp.state = IPState.ALERT
+            self.IDSet(sp)
+            return
         
+        # Toggle on or off
+        if data['uband_lamps']:
+            sp['uband_power'].value = 'On'
+        else: sp['uband_power'].value = 'Off'
+
+        if data['halogen_lamps']:
+            sp['halogen_power'].value = 'On'
+        else: sp['halogen_power'].value = 'Off'
+
+        # Set indicator to green
+        sp.state = IPState.OK
         self.IDSet(sp)
 
         return
