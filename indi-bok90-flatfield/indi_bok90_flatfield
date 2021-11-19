@@ -1,2 +1,3 @@
 #!/bin/bash
-/home/mtnops/src/git-clones/python-indidrivers/env/bin/python3 /home/mtnops/src/git-clones/python-indidrivers/indi-bok90-flatfield/indi_bok90_flatfield.py
+# This is a wrapper to call the right python env to run the pyindi driver
+/home/mtnops/anaconda3/bin/python /home/mtnops/src/git-clones/python-indidrivers/indi-bok90-flatfield/indi_bok90_flatfield.py
